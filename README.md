@@ -1,3 +1,3 @@
 # SamplePlugin
 
-A description of this package.
+Plugin Sample for Unity.
