@@ -20,3 +20,14 @@ bundle/cp:
 
 .PHONY: bundle
 bundle: clean bundle/build bundle/cp
+
+.PHONY: framework/build
+framework/build:
+	mint run swift-create-xcframework --output ./$(BUILD_DIR)/Framework --platform ios --configuration release
+
+.PHONY: framework/cp
+framework/cp:
+	cp -r ./$(BUILD_DIR)/Framework/$(BASE_NAME).xcframework/ios-arm64/$(BASE_NAME).framework $(UNITY_PLUGIN_IOS_DIR)/$(BASE_NAME).framework
+
+.PHONY: framework
+framework: clean framework/build framework/cp
