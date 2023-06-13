@@ -9,18 +9,19 @@ import SwiftUI
 import SamplePlugin
 
 struct ContentView: View {
-    @State var number = 0
+    @State var steps = 0
     
     var body: some View {
         VStack {
-            Text("\(number)")
+            Text("\(steps)")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.accentColor)
 
-
             Button(action: {
-                number = Int(sample_plugin_helloworld())
+                HealthKitData().getStepsToday { steps in
+                    self.steps = steps
+                }
             }) {
                 Text("Tap me!")
                     .font(.title)
@@ -32,6 +33,11 @@ struct ContentView: View {
             }
         }
         .padding()
+        .onAppear {
+            HealthKitData().authorize { success in
+                print("authorize: \(success)")
+            }
+        }
     }
 }
 
