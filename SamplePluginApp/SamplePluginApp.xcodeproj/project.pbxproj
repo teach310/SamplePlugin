@@ -15,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CE1E4E412A38A86200236679 /* SamplePluginApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SamplePluginApp.entitlements; sourceTree = "<group>"; };
 		CE39FAEC2A2F21060043778A /* SamplePluginApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SamplePluginApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE39FAEF2A2F21060043778A /* SamplePluginAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplePluginAppApp.swift; sourceTree = "<group>"; };
 		CE39FAF12A2F21060043778A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -54,6 +55,7 @@
 		CE39FAEE2A2F21060043778A /* SamplePluginApp */ = {
 			isa = PBXGroup;
 			children = (
+				CE1E4E412A38A86200236679 /* SamplePluginApp.entitlements */,
 				CE39FAEF2A2F21060043778A /* SamplePluginAppApp.swift */,
 				CE39FAF12A2F21060043778A /* ContentView.swift */,
 				CE39FAF32A2F21070043778A /* Assets.xcassets */,
@@ -277,6 +279,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SamplePluginApp/SamplePluginApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SamplePluginApp/Preview Content\"";
@@ -306,6 +309,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SamplePluginApp/SamplePluginApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SamplePluginApp/Preview Content\"";
