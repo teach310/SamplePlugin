@@ -10,6 +10,7 @@ import SamplePlugin
 
 struct ContentView: View {
     @State var number = 0
+    @State var bleSample = BLESample()
     
     var body: some View {
         VStack {
@@ -20,7 +21,7 @@ struct ContentView: View {
 
 
             Button(action: {
-                number = Int(sample_plugin_helloworld())
+                bleSample.helloWorld()
             }) {
                 Text("Tap me!")
                     .font(.title)
