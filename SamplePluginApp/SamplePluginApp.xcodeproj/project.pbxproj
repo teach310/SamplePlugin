@@ -20,6 +20,7 @@
 		CE39FAF12A2F21060043778A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CE39FAF32A2F21070043778A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CE39FAF62A2F21070043778A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		CEC774E32A6BB7A400B3A114 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +55,7 @@
 		CE39FAEE2A2F21060043778A /* SamplePluginApp */ = {
 			isa = PBXGroup;
 			children = (
+				CEC774E32A6BB7A400B3A114 /* Info.plist */,
 				CE39FAEF2A2F21060043778A /* SamplePluginAppApp.swift */,
 				CE39FAF12A2F21060043778A /* ContentView.swift */,
 				CE39FAF32A2F21070043778A /* Assets.xcassets */,
@@ -283,6 +285,8 @@
 				DEVELOPMENT_TEAM = 8KC4L2BAV2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SamplePluginApp/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "use Bluetooth";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -312,6 +316,8 @@
 				DEVELOPMENT_TEAM = 8KC4L2BAV2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SamplePluginApp/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "use Bluetooth";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
