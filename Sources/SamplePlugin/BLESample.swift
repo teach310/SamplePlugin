@@ -4,6 +4,7 @@ import CoreBluetooth
 public class BLESample: NSObject, CBCentralManagerDelegate {
     var centralManager: CBCentralManager!
     var serviceUUID: CBUUID!
+    var peripheral: CBPeripheral!
     
     public override init() {
         super.init()
@@ -60,6 +61,22 @@ public class BLESample: NSObject, CBCentralManagerDelegate {
     
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
         print("Device found: \(peripheral)")
+        self.peripheral = peripheral
         central.stopScan()
+        // optionsは特に指定しないといけなそうなものがなかったため、nilを指定している
+        // https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518766-connect
+        central.connect(peripheral)
+    }
+    
+    public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        print("centralManager:didConnect: \(peripheral)")
+    }
+    
+    public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        print("centralManager:didFailToConnect: \(peripheral)")
+    }
+    
+    public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        print("centralManager:didDisconnectPeripheral: \(peripheral)")
     }
 }
