@@ -33,6 +33,13 @@ public class BLESample: NSObject, CBCentralManagerDelegate {
         // https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518986-scanforperipherals
         centralManager.scanForPeripherals(withServices: [serviceUUID], options: options)
     }
+
+    public func isConnected() -> Bool {
+        if peripheral == nil {
+            return false
+        }
+        return peripheral.state == .connected
+    }
     
     func cbManagerStateName(_ state: CBManagerState) -> String {
         switch state {

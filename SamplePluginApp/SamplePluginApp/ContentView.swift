@@ -21,7 +21,11 @@ struct ContentView: View {
 
 
             Button(action: {
-                bleSample.scan()
+                if bleSample.isConnected() {
+                    print("connected")
+                } else {
+                    bleSample.scan()
+                }
             }) {
                 Text("Tap me!")
                     .font(.title)
