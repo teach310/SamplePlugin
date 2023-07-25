@@ -21,7 +21,7 @@ struct ContentView: View {
 
 
             Button(action: {
-                bleSample.helloWorld()
+                bleSample.scan()
             }) {
                 Text("Tap me!")
                     .font(.title)
