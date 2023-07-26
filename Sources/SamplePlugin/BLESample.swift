@@ -5,8 +5,10 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var centralManager: CBCentralManager!
     var serviceUUID: CBUUID!
     var characteristicUUID: CBUUID!
+    var notifyCharacteristicUUID: CBUUID!
     var peripheral: CBPeripheral!
     var remoteCharacteristic: CBCharacteristic!
+    var notifyRemoteCharacteristic: CBCharacteristic!
     
     public override init() {
         super.init()
@@ -15,6 +17,7 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         centralManager = CBCentralManager(delegate: self, queue: nil)
         serviceUUID = CBUUID(string: "068c47b7-fc04-4d47-975a-7952be1a576f")
         characteristicUUID = CBUUID(string: "e3737b3f-a08d-405b-b32d-35a8f6c64c5d")
+        notifyCharacteristicUUID = CBUUID(string: "c9da2ce8-d119-40d5-90f7-ef24627e8193")
     }
     
     public func scan() {
@@ -122,7 +125,7 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
         
         for service in services {
-            peripheral.discoverCharacteristics([characteristicUUID], for: service)
+            peripheral.discoverCharacteristics([characteristicUUID, notifyCharacteristicUUID], for: service)
         }
     }
     
@@ -135,6 +138,11 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         }
 
         self.remoteCharacteristic = characteristics.first { $0.uuid == characteristicUUID }
+        self.notifyRemoteCharacteristic = characteristics.first { $0.uuid == notifyCharacteristicUUID }
+        if let notifyRemoteCharacteristic = notifyRemoteCharacteristic {
+            // https://developer.apple.com/documentation/corebluetooth/cbperipheral/1518949-setnotifyvalue
+            peripheral.setNotifyValue(true, for: notifyRemoteCharacteristic)
+        }
         
         for characteristic in characteristics {
             if characteristic.properties.contains(.read) {
@@ -160,6 +168,14 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     // writeValue を .withResponse で実行した場合に呼ばれる
     public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         print("peripheral:didWriteValueFor: \(characteristic)")
+        if let error = error {
+            print("error: \(error)")
+            return
+        }
+    }
+    
+    public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        print("peripheral:didUpdateNotificationStateFor: \(characteristic)")
         if let error = error {
             print("error: \(error)")
             return
