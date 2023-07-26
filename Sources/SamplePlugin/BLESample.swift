@@ -1,9 +1,10 @@
 import Foundation
 import CoreBluetooth
 
-public class BLESample: NSObject, CBCentralManagerDelegate {
+public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     var centralManager: CBCentralManager!
     var serviceUUID: CBUUID!
+    var characteristicUUID: CBUUID!
     var peripheral: CBPeripheral!
     
     public override init() {
@@ -12,6 +13,7 @@ public class BLESample: NSObject, CBCentralManagerDelegate {
         // https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1519001-init
         centralManager = CBCentralManager(delegate: self, queue: nil)
         serviceUUID = CBUUID(string: "068c47b7-fc04-4d47-975a-7952be1a576f")
+        characteristicUUID = CBUUID(string: "e3737b3f-a08d-405b-b32d-35a8f6c64c5d")
     }
     
     public func scan() {
@@ -33,7 +35,7 @@ public class BLESample: NSObject, CBCentralManagerDelegate {
         // https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518986-scanforperipherals
         centralManager.scanForPeripherals(withServices: [serviceUUID], options: options)
     }
-
+    
     public func isConnected() -> Bool {
         if peripheral == nil {
             return false
@@ -69,6 +71,7 @@ public class BLESample: NSObject, CBCentralManagerDelegate {
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
         print("Device found: \(peripheral)")
         self.peripheral = peripheral
+        self.peripheral.delegate = self
         central.stopScan()
         // optionsは特に指定しないといけなそうなものがなかったため、nilを指定している
         // https://developer.apple.com/documentation/corebluetooth/cbcentralmanager/1518766-connect
@@ -77,6 +80,8 @@ public class BLESample: NSObject, CBCentralManagerDelegate {
     
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("centralManager:didConnect: \(peripheral)")
+        
+        peripheral.discoverServices([serviceUUID])
     }
     
     public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
@@ -85,5 +90,49 @@ public class BLESample: NSObject, CBCentralManagerDelegate {
     
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         print("centralManager:didDisconnectPeripheral: \(peripheral)")
+    }
+    
+    // MARK: - CBPeripheralDelegate
+    
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        let services = peripheral.services ?? []
+        print("peripheral:didDiscoverServices: \(services)")
+        if let error = error {
+            print("error: \(error)")
+            return
+        }
+        
+        for service in services {
+            peripheral.discoverCharacteristics([characteristicUUID], for: service)
+        }
+    }
+    
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        let characteristics = service.characteristics ?? []
+        print("peripheral:didDiscoverCharacteristicsFor: \(characteristics)")
+        if let error = error {
+            print("error: \(error)")
+            return
+        }
+        
+        for characteristic in characteristics {
+            if characteristic.properties.contains(.read) {
+                peripheral.readValue(for: characteristic)
+            }
+        }
+    }
+    
+    // セントラルのread, ペリフェラルのnotifyによりvalueが更新されたときに呼ばれる
+    public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        print("peripheral:didUpdateValueFor: \(characteristic)")
+        if let error = error {
+            print("error: \(error)")
+            return
+        }
+        
+        if let data = characteristic.value {
+            print("data: \(data)")
+            print("string: \(String(data: data, encoding: .utf8) ?? "")")
+        }
     }
 }
