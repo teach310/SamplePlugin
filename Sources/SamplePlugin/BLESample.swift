@@ -6,6 +6,7 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var serviceUUID: CBUUID!
     var characteristicUUID: CBUUID!
     var peripheral: CBPeripheral!
+    var remoteCharacteristic: CBCharacteristic!
     
     public override init() {
         super.init()
@@ -41,6 +42,24 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             return false
         }
         return peripheral.state == .connected
+    }
+
+    public func writeData() {
+        if peripheral == nil {
+            print("peripheral is nil")
+            return
+        }
+
+        guard let characteristic = remoteCharacteristic else {
+            print("characteristic is nil")
+            return
+        }
+
+        // ランダムな三桁の数値の文字列を書き込む
+        let value = "Write Data " + String(format: "%03d", Int.random(in: 100..<1000))
+        // type はwithResponseである必要はないが、取れるようにしておく
+        // https://developer.apple.com/documentation/corebluetooth/cbperipheral/1518747-writevalue
+        peripheral.writeValue(value.data(using: .utf8)!, for: characteristic, type: .withResponse)
     }
     
     func cbManagerStateName(_ state: CBManagerState) -> String {
@@ -114,6 +133,8 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
             print("error: \(error)")
             return
         }
+
+        self.remoteCharacteristic = characteristics.first { $0.uuid == characteristicUUID }
         
         for characteristic in characteristics {
             if characteristic.properties.contains(.read) {
@@ -133,6 +154,15 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         if let data = characteristic.value {
             print("data: \(data)")
             print("string: \(String(data: data, encoding: .utf8) ?? "")")
+        }
+    }
+
+    // writeValue を .withResponse で実行した場合に呼ばれる
+    public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        print("peripheral:didWriteValueFor: \(characteristic)")
+        if let error = error {
+            print("error: \(error)")
+            return
         }
     }
 }

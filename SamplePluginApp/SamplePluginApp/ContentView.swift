@@ -22,7 +22,7 @@ struct ContentView: View {
 
             Button(action: {
                 if bleSample.isConnected() {
-                    print("connected")
+                    bleSample.writeData()
                 } else {
                     bleSample.scan()
                 }
