@@ -16,6 +16,7 @@ bundle/build:
 
 .PHONY: bundle/cp
 bundle/cp:
+	rm -rf $(UNITY_PLUGIN_MACOS_DIR)/$(BUNDLE_NAME).bundle
 	cp -r $(BUILD_DIR)/Bundle/Build/Products/Release/$(BUNDLE_NAME).bundle $(UNITY_PLUGIN_MACOS_DIR)/$(BUNDLE_NAME).bundle
 
 .PHONY: bundle
@@ -27,6 +28,7 @@ framework/build:
 
 .PHONY: framework/cp
 framework/cp:
+	rm -rf $(UNITY_PLUGIN_IOS_DIR)/$(BASE_NAME).framework
 	cp -r ./$(BUILD_DIR)/Framework/$(BASE_NAME).xcframework/ios-arm64/$(BASE_NAME).framework $(UNITY_PLUGIN_IOS_DIR)/$(BASE_NAME).framework
 
 .PHONY: framework
