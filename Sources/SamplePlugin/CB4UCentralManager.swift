@@ -4,8 +4,13 @@ import CoreBluetooth
 // This is a wrapper class for exposing CBCentralManager to Unity.
 public class CB4UCentralManager: NSObject, CBCentralManagerDelegate {
     private var centralManager: CBCentralManager!
+    private var peripherals: Dictionary<String, CBPeripheral> = [:]
+
     var didUpdateStateHandler: CB4UCentralManagerDidUpdateStateHandler?
     var didDiscoverPeripheralHandler: CB4UCentralManagerDidDiscoverPeripheralHandler?
+    var didConnectPeripheralHandler: CB4UCentralManagerDidConnectPeripheralHandler?
+    var didFailToConnectPeripheralHandler: CB4UCentralManagerDidFailToConnectPeripheralHandler?
+    var didDisconnectPeripheralHandler: CB4UCentralManagerDidDisconnectPeripheralHandler?
     
     public override init() {
         super.init()
@@ -35,6 +40,16 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate {
         return centralManager.isScanning
     }
     
+    // MARK: Establishing or Canceling Connections with Peripherals
+
+    public func connect(_ peripheralId: String) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        centralManager.connect(peripheral)
+        return 0
+    }
+
     // MARK: - CBCentralManagerDelegate
     
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
@@ -42,10 +57,46 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate {
     }
     
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
-        peripheral.identifier.uuidString.withCString { (uuidCString) in
+        let peripheralId = peripheral.identifier.uuidString
+        peripherals[peripheralId] = peripheral
+        peripheralId.withCString { (uuidCString) in
             (peripheral.name ?? "").withCString { (nameCString) in
                 didDiscoverPeripheralHandler?(selfPointer(), uuidCString, nameCString)
             }
         }
+    }
+
+    public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        let peripheralId = peripheral.identifier.uuidString
+        peripheralId.withCString { (uuidCString) in
+            didConnectPeripheralHandler?(selfPointer(), uuidCString)
+        }
+    }
+
+    public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        let peripheralId = peripheral.identifier.uuidString
+        peripheralId.withCString { (uuidCString) in
+            didFailToConnectPeripheralHandler?(selfPointer(), uuidCString, errorToCode(error))
+        }
+    }
+
+    public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        let peripheralId = peripheral.identifier.uuidString
+        peripheralId.withCString { (uuidCString) in
+            didDisconnectPeripheralHandler?(selfPointer(), uuidCString, errorToCode(error))
+        }
+    }
+
+    // NOTE: code 0 is unknown error. so if error is nil, return -1.
+    func errorToCode(_ error: Error?) -> Int32 {
+        if error == nil {
+            return -1
+        }
+
+        if let error = error as? CBError {
+            return Int32(error.errorCode)
+        }
+
+        return Int32(error!._code)
     }
 }

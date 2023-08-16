@@ -14,17 +14,26 @@ public func cb4u_central_manager_release(_ centralPtr: UnsafeRawPointer) {
 
 public typealias CB4UCentralManagerDidUpdateStateHandler = @convention(c) (UnsafeRawPointer, Int32) -> Void
 public typealias CB4UCentralManagerDidDiscoverPeripheralHandler = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>, UnsafePointer<CChar>) -> Void
+public typealias CB4UCentralManagerDidConnectPeripheralHandler = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>) -> Void
+public typealias CB4UCentralManagerDidFailToConnectPeripheralHandler = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>, Int32) -> Void
+public typealias CB4UCentralManagerDidDisconnectPeripheralHandler = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>, Int32) -> Void
 
 @_cdecl("cb4u_central_manager_register_handlers")
 public func cb4u_central_manager_register_handlers(
     _ centralPtr: UnsafeRawPointer,
     _ didUpdateStateHandler: @escaping CB4UCentralManagerDidUpdateStateHandler,
-    _ didDiscoverPeripheralHandler: @escaping CB4UCentralManagerDidDiscoverPeripheralHandler
+    _ didDiscoverPeripheralHandler: @escaping CB4UCentralManagerDidDiscoverPeripheralHandler,
+    _ didConnectPeripheralHandler: @escaping CB4UCentralManagerDidConnectPeripheralHandler,
+    _ didFailToConnectPeripheralHandler: @escaping CB4UCentralManagerDidFailToConnectPeripheralHandler,
+    _ didDisconnectPeripheralHandler: @escaping CB4UCentralManagerDidDisconnectPeripheralHandler
 ) {
     let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
     
     instance.didUpdateStateHandler = didUpdateStateHandler
     instance.didDiscoverPeripheralHandler = didDiscoverPeripheralHandler
+    instance.didConnectPeripheralHandler = didConnectPeripheralHandler
+    instance.didFailToConnectPeripheralHandler = didFailToConnectPeripheralHandler
+    instance.didDisconnectPeripheralHandler = didDisconnectPeripheralHandler
 }
 
 @_cdecl("cb4u_central_manager_scan_for_peripherals")
@@ -52,4 +61,11 @@ public func cb4u_central_manager_is_scanning(_ centralPtr: UnsafeRawPointer) -> 
     let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
     
     return instance.isScanning
+}
+
+@_cdecl("cb4u_central_manager_connect_peripheral")
+public func cb4u_central_manager_connect_peripheral(_ centralPtr: UnsafeRawPointer, _ peripheralId: UnsafePointer<CChar>) -> Int32 {
+    let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
+    
+    return instance.connect(String(cString: peripheralId))
 }
