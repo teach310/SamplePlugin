@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 
 // This is a wrapper class for exposing CBCentralManager to Unity.
-public class CB4UCentralManager: NSObject, CBCentralManagerDelegate {
+public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     private var centralManager: CBCentralManager!
     private var peripherals: Dictionary<String, CBPeripheral> = [:]
 
@@ -11,6 +11,8 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate {
     var didConnectPeripheralHandler: CB4UCentralManagerDidConnectPeripheralHandler?
     var didFailToConnectPeripheralHandler: CB4UCentralManagerDidFailToConnectPeripheralHandler?
     var didDisconnectPeripheralHandler: CB4UCentralManagerDidDisconnectPeripheralHandler?
+
+    var didDiscoverServicesHandler: CB4UPeripheralDidDiscoverServicesHandler?
     
     public override init() {
         super.init()
@@ -50,6 +52,14 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate {
         return 0
     }
 
+    public func discoverServices(_ peripheralId: String, _ serviceUUIDs: [CBUUID]?) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        peripheral.discoverServices(serviceUUIDs)
+        return 0
+    }
+
     // MARK: - CBCentralManagerDelegate
     
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
@@ -59,6 +69,7 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate {
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
         let peripheralId = peripheral.identifier.uuidString
         peripherals[peripheralId] = peripheral
+        peripheral.delegate = self
         peripheralId.withCString { (uuidCString) in
             (peripheral.name ?? "").withCString { (nameCString) in
                 didDiscoverPeripheralHandler?(selfPointer(), uuidCString, nameCString)
@@ -84,6 +95,19 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate {
         let peripheralId = peripheral.identifier.uuidString
         peripheralId.withCString { (uuidCString) in
             didDisconnectPeripheralHandler?(selfPointer(), uuidCString, errorToCode(error))
+        }
+    }
+
+    // MARK: - CBPeripheralDelegate
+
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        let peripheralId = peripheral.identifier.uuidString
+        let commaSeparatedServiceIds = peripheral.services?.map { $0.uuid.uuidString }.joined(separator: ",") ?? ""
+
+        peripheralId.withCString { (peripheralIdCString) in
+            commaSeparatedServiceIds.withCString { (commaSeparatedServiceIdsCString) in
+                didDiscoverServicesHandler?(selfPointer(), peripheralIdCString, commaSeparatedServiceIdsCString, errorToCode(error))
+            }
         }
     }
 
