@@ -14,6 +14,7 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
 
     var didDiscoverServicesHandler: CB4UPeripheralDidDiscoverServicesHandler?
     var didDiscoverCharacteristicsHandler: CB4UPeripheralDidDiscoverCharacteristicsHandler?
+    var didUpdateValueForCharacteristicHandler: CB4UPeripheralDidUpdateValueForCharacteristicHandler?
     
     public override init() {
         super.init()
@@ -69,6 +70,20 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
             return -1
         }
         peripheral.discoverCharacteristics(characteristicUUIDs, for: service)
+        return 0
+    }
+
+    public func readValue(_ peripheralId: String, _ serviceUUID: CBUUID, _ characteristicUUID: CBUUID) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        guard let service = peripheral.services?.first(where: { $0.uuid == serviceUUID }) else {
+            return -1
+        }
+        guard let characteristic = service.characteristics?.first(where: { $0.uuid == characteristicUUID }) else {
+            return -1
+        }
+        peripheral.readValue(for: characteristic)
         return 0
     }
 
@@ -132,6 +147,24 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
             serviceId.withCString { (serviceIdCString) in
                 commaSeparatedCharacteristicIds.withCString { (commaSeparatedCharacteristicIdsCString) in
                     didDiscoverCharacteristicsHandler?(selfPointer(), peripheralIdCString, serviceIdCString, commaSeparatedCharacteristicIdsCString, errorToCode(error))
+                }
+            }
+        }
+    }
+
+    public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        let peripheralId = peripheral.identifier.uuidString
+        let serviceId = characteristic.service?.uuid.uuidString ?? ""
+        let characteristicId = characteristic.uuid.uuidString
+        let value = characteristic.value ?? Data()
+
+        peripheralId.withCString { (peripheralIdCString) in
+            serviceId.withCString { (serviceIdCString) in
+                characteristicId.withCString { (characteristicIdCString) in
+                    value.withUnsafeBytes { (valueBytes: UnsafeRawBufferPointer) in
+                        let bytes = valueBytes.bindMemory(to: UInt8.self).baseAddress!
+                        didUpdateValueForCharacteristicHandler?(selfPointer(), peripheralIdCString, serviceIdCString, characteristicIdCString, bytes, Int32(value.count), errorToCode(error))
+                    }
                 }
             }
         }
