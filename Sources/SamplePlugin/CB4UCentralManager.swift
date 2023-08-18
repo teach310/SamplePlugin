@@ -13,6 +13,7 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
     var didDisconnectPeripheralHandler: CB4UCentralManagerDidDisconnectPeripheralHandler?
 
     var didDiscoverServicesHandler: CB4UPeripheralDidDiscoverServicesHandler?
+    var didDiscoverCharacteristicsHandler: CB4UPeripheralDidDiscoverCharacteristicsHandler?
     
     public override init() {
         super.init()
@@ -57,6 +58,17 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
             return -1
         }
         peripheral.discoverServices(serviceUUIDs)
+        return 0
+    }
+
+    public func discoverCharacteristics(_ peripheralId: String, _ serviceUUID: CBUUID, _ characteristicUUIDs: [CBUUID]?) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        guard let service = peripheral.services?.first(where: { $0.uuid == serviceUUID }) else {
+            return -1
+        }
+        peripheral.discoverCharacteristics(characteristicUUIDs, for: service)
         return 0
     }
 
@@ -110,6 +122,21 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
             }
         }
     }
+
+    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        let peripheralId = peripheral.identifier.uuidString
+        let serviceId = service.uuid.uuidString
+        let commaSeparatedCharacteristicIds = service.characteristics?.map { $0.uuid.uuidString }.joined(separator: ",") ?? ""
+
+        peripheralId.withCString { (peripheralIdCString) in
+            serviceId.withCString { (serviceIdCString) in
+                commaSeparatedCharacteristicIds.withCString { (commaSeparatedCharacteristicIdsCString) in
+                    didDiscoverCharacteristicsHandler?(selfPointer(), peripheralIdCString, serviceIdCString, commaSeparatedCharacteristicIdsCString, errorToCode(error))
+                }
+            }
+        }
+    }
+
 
     // NOTE: code 0 is unknown error. so if error is nil, return -1.
     func errorToCode(_ error: Error?) -> Int32 {
