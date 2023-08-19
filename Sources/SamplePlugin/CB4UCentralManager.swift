@@ -54,6 +54,19 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         return 0
     }
 
+    public func characteristicProperties(_ peripheralId: String, _ serviceId: String, _ characteristicId: String) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        guard let service = peripheral.services?.first(where: { $0.uuid.uuidString == serviceId }) else {
+            return -1
+        }
+        guard let characteristic = service.characteristics?.first(where: { $0.uuid.uuidString == characteristicId }) else {
+            return -1
+        }
+        return Int32(characteristic.properties.rawValue)
+    }
+
     public func discoverServices(_ peripheralId: String, _ serviceUUIDs: [CBUUID]?) -> Int32 {
         guard let peripheral = peripherals[peripheralId] else {
             return -1

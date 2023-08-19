@@ -18,6 +18,31 @@ public class BLESample: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         serviceUUID = CBUUID(string: "068c47b7-fc04-4d47-975a-7952be1a576f")
         characteristicUUID = CBUUID(string: "e3737b3f-a08d-405b-b32d-35a8f6c64c5d")
         notifyCharacteristicUUID = CBUUID(string: "c9da2ce8-d119-40d5-90f7-ef24627e8193")
+//        printAllCharacteristicPropertiesRawValue()
+    }
+
+    // rawValue確認用
+//    CBCharacteristicProperties.broadcast: 1
+//    CBCharacteristicProperties.read: 2
+//    CBCharacteristicProperties.writeWithoutResponse: 4
+//    CBCharacteristicProperties.write: 8
+//    CBCharacteristicProperties.notify: 16
+//    CBCharacteristicProperties.indicate: 32
+//    CBCharacteristicProperties.authenticatedSignedWrites: 64
+//    CBCharacteristicProperties.extendedProperties: 128
+//    CBCharacteristicProperties.notifyEncryptionRequired: 256
+//    CBCharacteristicProperties.indicateEncryptionRequired: 512
+    func printAllCharacteristicPropertiesRawValue() {
+        print("CBCharacteristicProperties.broadcast: \(CBCharacteristicProperties.broadcast.rawValue)")
+        print("CBCharacteristicProperties.read: \(CBCharacteristicProperties.read.rawValue)")
+        print("CBCharacteristicProperties.writeWithoutResponse: \(CBCharacteristicProperties.writeWithoutResponse.rawValue)")
+        print("CBCharacteristicProperties.write: \(CBCharacteristicProperties.write.rawValue)")
+        print("CBCharacteristicProperties.notify: \(CBCharacteristicProperties.notify.rawValue)")
+        print("CBCharacteristicProperties.indicate: \(CBCharacteristicProperties.indicate.rawValue)")
+        print("CBCharacteristicProperties.authenticatedSignedWrites: \(CBCharacteristicProperties.authenticatedSignedWrites.rawValue)")
+        print("CBCharacteristicProperties.extendedProperties: \(CBCharacteristicProperties.extendedProperties.rawValue)")
+        print("CBCharacteristicProperties.notifyEncryptionRequired: \(CBCharacteristicProperties.notifyEncryptionRequired.rawValue)")
+        print("CBCharacteristicProperties.indicateEncryptionRequired: \(CBCharacteristicProperties.indicateEncryptionRequired.rawValue)")
     }
     
     public func scan() {
