@@ -15,6 +15,7 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
     var didDiscoverServicesHandler: CB4UPeripheralDidDiscoverServicesHandler?
     var didDiscoverCharacteristicsHandler: CB4UPeripheralDidDiscoverCharacteristicsHandler?
     var didUpdateValueForCharacteristicHandler: CB4UPeripheralDidUpdateValueForCharacteristicHandler?
+    var didWriteValueForCharacteristicHandler: CB4UPeripheralDidWriteValueForCharacteristicHandler?
     
     public override init() {
         super.init()
@@ -97,6 +98,20 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
             return -1
         }
         peripheral.readValue(for: characteristic)
+        return 0
+    }
+
+    public func writeValue(_ peripheralId: String, _ serviceUUID: CBUUID, _ characteristicUUID: CBUUID, _ data: Data, _ type: CBCharacteristicWriteType) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        guard let service = peripheral.services?.first(where: { $0.uuid == serviceUUID }) else {
+            return -1
+        }
+        guard let characteristic = service.characteristics?.first(where: { $0.uuid == characteristicUUID }) else {
+            return -1
+        }
+        peripheral.writeValue(data, for: characteristic, type: type)
         return 0
     }
 
@@ -183,6 +198,19 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         }
     }
 
+    public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        let peripheralId = peripheral.identifier.uuidString
+        let serviceId = characteristic.service?.uuid.uuidString ?? ""
+        let characteristicId = characteristic.uuid.uuidString
+
+        peripheralId.withCString { (peripheralIdCString) in
+            serviceId.withCString { (serviceIdCString) in
+                characteristicId.withCString { (characteristicIdCString) in
+                    didWriteValueForCharacteristicHandler?(selfPointer(), peripheralIdCString, serviceIdCString, characteristicIdCString, errorToCode(error))
+                }
+            }
+        }
+    }
 
     // NOTE: code 0 is unknown error. so if error is nil, return -1.
     func errorToCode(_ error: Error?) -> Int32 {
