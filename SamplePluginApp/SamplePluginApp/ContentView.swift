@@ -6,37 +6,40 @@
 //
 
 import SwiftUI
-import SamplePlugin
+
 
 struct ContentView: View {
-    @State var number = 0
-    @State var bleSample = BLESample()
+    
     
     var body: some View {
-        VStack {
-            Text("\(number)")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundColor(.accentColor)
-
-
-            Button(action: {
-                if bleSample.isConnected() {
-                    bleSample.writeData()
-                } else {
-                    bleSample.scan()
-                }
-            }) {
-                Text("Tap me!")
-                    .font(.title)
+        NavigationView {
+            VStack {
+                Text("BLESample")
+                    .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.accentColor)
-                    .cornerRadius(10)
+                    .foregroundColor(.accentColor)
+                
+                NavigationLink(destination: BLEClientView()) {
+                    Text("BLEClient")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.green)
+                        .cornerRadius(10)
+                }
+                
+                NavigationLink(destination: BLEServerView()) {
+                    Text("BLEServer")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                }
             }
         }
-        .padding()
     }
 }
 

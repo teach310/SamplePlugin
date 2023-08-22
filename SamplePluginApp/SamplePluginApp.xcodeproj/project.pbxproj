@@ -12,6 +12,8 @@
 		CE39FAF42A2F21070043778A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE39FAF32A2F21070043778A /* Assets.xcassets */; };
 		CE39FAF72A2F21070043778A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE39FAF62A2F21070043778A /* Preview Assets.xcassets */; };
 		CE39FAFF2A2F25BE0043778A /* SamplePlugin in Frameworks */ = {isa = PBXBuildFile; productRef = CE39FAFE2A2F25BE0043778A /* SamplePlugin */; };
+		CE4D6BF92A94ECD60030AFCA /* BLEClientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4D6BF82A94ECD60030AFCA /* BLEClientView.swift */; };
+		CE4D6BFB2A94EF090030AFCA /* BLEServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4D6BFA2A94EF090030AFCA /* BLEServerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +22,8 @@
 		CE39FAF12A2F21060043778A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CE39FAF32A2F21070043778A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CE39FAF62A2F21070043778A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		CE4D6BF82A94ECD60030AFCA /* BLEClientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEClientView.swift; sourceTree = "<group>"; };
+		CE4D6BFA2A94EF090030AFCA /* BLEServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEServerView.swift; sourceTree = "<group>"; };
 		CEC774E32A6BB7A400B3A114 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -60,6 +64,8 @@
 				CE39FAF12A2F21060043778A /* ContentView.swift */,
 				CE39FAF32A2F21070043778A /* Assets.xcassets */,
 				CE39FAF52A2F21070043778A /* Preview Content */,
+				CE4D6BF82A94ECD60030AFCA /* BLEClientView.swift */,
+				CE4D6BFA2A94EF090030AFCA /* BLEServerView.swift */,
 			);
 			path = SamplePluginApp;
 			sourceTree = "<group>";
@@ -153,7 +159,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE39FAF22A2F21060043778A /* ContentView.swift in Sources */,
+				CE4D6BF92A94ECD60030AFCA /* BLEClientView.swift in Sources */,
 				CE39FAF02A2F21060043778A /* SamplePluginAppApp.swift in Sources */,
+				CE4D6BFB2A94EF090030AFCA /* BLEServerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
