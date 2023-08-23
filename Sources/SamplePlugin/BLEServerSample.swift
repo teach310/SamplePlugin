@@ -7,6 +7,7 @@ public class BLEServerSample: NSObject, CBPeripheralManagerDelegate {
     var characteristicUUID: CBUUID!
     var notifyCharacteristicUUID: CBUUID!
 
+    var characteristic: CBMutableCharacteristic?
     var notifyCharacteristic: CBMutableCharacteristic?
 
     public override init() {
@@ -62,11 +63,11 @@ public class BLEServerSample: NSObject, CBPeripheralManagerDelegate {
 
         if peripheral.state == .poweredOn {
             let service = CBMutableService(type: serviceUUID, primary: true)
-            // 実際にはread, write, notifyが良さそうな感じがある
+            // 参考
             // https://toio.github.io/toio-spec/docs/2.1.0/ble_configuration
-            let characteristic = CBMutableCharacteristic(
+            characteristic = CBMutableCharacteristic(
                 type: characteristicUUID,
-                properties: [.read, .write],
+                properties: [.read, .write, .notify],
                 value: nil,
                 permissions: [.readable, .writeable]
             )
@@ -80,7 +81,7 @@ public class BLEServerSample: NSObject, CBPeripheralManagerDelegate {
 
             // Descriptorは必須ではなさそうなため省略
 
-            service.characteristics = [characteristic, notifyCharacteristic!]
+            service.characteristics = [characteristic!, notifyCharacteristic!]
             peripheral.add(service)
         }
     }
@@ -150,9 +151,31 @@ public class BLEServerSample: NSObject, CBPeripheralManagerDelegate {
 
             if let data = request.value {
                 print("data: \(String(data: data, encoding: .utf8) ?? "")")
+
+                // characteristic でnotify
+                peripheralManager.updateValue(
+                    data,
+                    for: characteristic!,
+                    onSubscribedCentrals: nil
+                )
             }
 
             peripheral.respond(to: request, withResult: .success)
         }
+    }
+
+    // 接続が切れた時にも呼ばれる    
+    public func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
+        print("didUnsubscribeFrom characteristic: \(characteristic.uuid.uuidString)")
+
+        if !characteristic.uuid.isEqual(notifyCharacteristicUUID) {
+            return
+        }
+
+        peripheral.startAdvertising([CBAdvertisementDataServiceUUIDsKey: [serviceUUID]])
+    }
+
+    public func peripheralManagerIsReady(toUpdateSubscribers peripheral: CBPeripheralManager) {
+        print("peripheralManagerIsReady")
     }
 }
