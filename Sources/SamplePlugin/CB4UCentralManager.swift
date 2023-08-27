@@ -26,6 +26,47 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
     func selfPointer() -> UnsafeMutableRawPointer {
         return Unmanaged.passUnretained(self).toOpaque()
     }
+
+    public func retrievePeripherals(withIdentifiers identifiers: [UUID], _ sb: UnsafeMutablePointer<CChar>, _ sbSize: Int) -> Int32 {
+        let foundPeripherals = centralManager.retrievePeripherals(withIdentifiers: identifiers)
+        let foundPeripheralsCount = foundPeripherals.count
+        if foundPeripheralsCount == 0 {
+            return -1
+        }
+
+        let commaSeparatedPeripheralIds = foundPeripherals.map { $0.identifier.uuidString }.joined(separator: ",")
+        let commaSeparatedPeripheralIdsLength = commaSeparatedPeripheralIds.utf8.count
+        if commaSeparatedPeripheralIdsLength + 1 > sbSize {
+            return -1
+        }
+
+        for peripheral in foundPeripherals {
+            peripherals[peripheral.identifier.uuidString] = peripheral
+        }
+
+        _ = commaSeparatedPeripheralIds.withCString { (uuidCString) in
+            strcpy(sb, uuidCString)
+        }
+
+        return 0
+    }
+
+    public func peripheralName(_ peripheralId: String, _ sb: UnsafeMutablePointer<CChar>, _ sbSize: Int) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        guard let peripheralName = peripheral.name else {
+            return -1
+        }
+        let peripheralNameLength = peripheralName.utf8.count
+        if peripheralNameLength + 1 > sbSize {
+            return -1
+        }
+        _ = peripheralName.withCString { (nameCString) in
+            strcpy(sb, nameCString)
+        }
+        return 0
+    }
     
     // MARK: - Scanning or Stopping Scans of Peripherals
     

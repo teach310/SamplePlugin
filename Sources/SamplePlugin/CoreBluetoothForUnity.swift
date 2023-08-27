@@ -52,10 +52,36 @@ public func cb4u_central_manager_register_handlers(
     instance.didUpdateNotificationStateForCharacteristicHandler = didUpdateNotificationStateForCharacteristicHandler
 }
 
+@_cdecl("cb4u_central_manager_retrieve_peripherals_with_identifiers")
+public func cb4u_central_manager_retrieve_peripherals_with_identifiers(
+    _ centralPtr: UnsafeRawPointer,
+    _ peripheralIds: UnsafePointer<UnsafePointer<CChar>?>,
+    _ peripheralIdsCount: Int32,
+    _ sb: UnsafeMutablePointer<CChar>,
+    _ sbSize: Int32
+    ) -> Int32 {
+    let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
+    
+    let peripheralIdsArray = (0..<Int(peripheralIdsCount)).compactMap { index -> UUID? in
+        let uuidString = String(cString: peripheralIds[index]!)
+        guard let uuid = UUID(uuidString: uuidString) else {
+            return nil
+        }
+        return uuid
+    }
+    // invalid peripheralIds
+    if peripheralIdsArray.count != Int(peripheralIdsCount) {
+        return -1
+    }
+    
+    return instance.retrievePeripherals(withIdentifiers: peripheralIdsArray, sb, Int(sbSize))
+}
+
 @_cdecl("cb4u_central_manager_scan_for_peripherals")
 public func cb4u_central_manager_scan_for_peripherals(_ centralPtr: UnsafeRawPointer, _ serviceUUIDs: UnsafePointer<UnsafePointer<CChar>?>, _ serviceUUIDsCount: Int32) {
     let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
     
+    // serviceIDがinvalidなときに-1を返したほうが良い。
     let serviceUUIDsArray = (0..<Int(serviceUUIDsCount)).map { index -> CBUUID in
         let uuidString = String(cString: serviceUUIDs[index]!)
         return CBUUID(string: uuidString)
@@ -84,6 +110,13 @@ public func cb4u_central_manager_connect_peripheral(_ centralPtr: UnsafeRawPoint
     let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
     
     return instance.connect(String(cString: peripheralId))
+}
+
+@_cdecl("cb4u_central_manager_peripheral_name")
+public func cb4u_central_manager_peripheral_name(_ centralPtr: UnsafeRawPointer, _ peripheralId: UnsafePointer<CChar>, _ sb: UnsafeMutablePointer<CChar>, _ sbSize: Int32) -> Int32 {
+    let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
+    
+    return instance.peripheralName(String(cString: peripheralId), sb, Int(sbSize))
 }
 
 @_cdecl("cb4u_central_manager_characteristic_properties")
