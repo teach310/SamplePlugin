@@ -67,6 +67,13 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         }
         return 0
     }
+
+    public func peripheralState(_ peripheralId: String) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        return Int32(peripheral.state.rawValue)
+    }
     
     // MARK: - Scanning or Stopping Scans of Peripherals
     

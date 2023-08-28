@@ -119,6 +119,13 @@ public func cb4u_central_manager_peripheral_name(_ centralPtr: UnsafeRawPointer,
     return instance.peripheralName(String(cString: peripheralId), sb, Int(sbSize))
 }
 
+@_cdecl("cb4u_central_manager_peripheral_state")
+public func cb4u_central_manager_peripheral_state(_ centralPtr: UnsafeRawPointer, _ peripheralId: UnsafePointer<CChar>) -> Int32 {
+    let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
+    
+    return instance.peripheralState(String(cString: peripheralId))
+}
+
 @_cdecl("cb4u_central_manager_characteristic_properties")
 public func cb4u_central_manager_characteristic_properties(_ centralPtr: UnsafeRawPointer, _ peripheralId: UnsafePointer<CChar>, _ serviceId: UnsafePointer<CChar>, _ characteristicId: UnsafePointer<CChar>) -> Int32 {
     let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
