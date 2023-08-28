@@ -104,6 +104,14 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         return 0
     }
 
+    public func cancelPeripheralConnection(_ peripheralId: String) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        centralManager.cancelPeripheralConnection(peripheral)
+        return 0
+    }
+
     public func characteristicProperties(_ peripheralId: String, _ serviceId: String, _ characteristicId: String) -> Int32 {
         guard let peripheral = peripherals[peripheralId] else {
             return -1

@@ -112,6 +112,13 @@ public func cb4u_central_manager_connect_peripheral(_ centralPtr: UnsafeRawPoint
     return instance.connect(String(cString: peripheralId))
 }
 
+@_cdecl("cb4u_central_manager_cancel_peripheral_connection")
+public func cb4u_central_manager_cancel_peripheral_connection(_ centralPtr: UnsafeRawPointer, _ peripheralId: UnsafePointer<CChar>) -> Int32 {
+    let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
+    
+    return instance.cancelPeripheralConnection(String(cString: peripheralId))
+}
+
 @_cdecl("cb4u_central_manager_peripheral_name")
 public func cb4u_central_manager_peripheral_name(_ centralPtr: UnsafeRawPointer, _ peripheralId: UnsafePointer<CChar>, _ sb: UnsafeMutablePointer<CChar>, _ sbSize: Int32) -> Int32 {
     let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
