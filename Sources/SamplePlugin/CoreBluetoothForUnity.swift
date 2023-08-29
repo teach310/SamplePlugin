@@ -23,7 +23,6 @@ public typealias CB4UPeripheralDidDiscoverCharacteristicsHandler = @convention(c
 public typealias CB4UPeripheralDidUpdateValueForCharacteristicHandler = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>, UnsafePointer<CChar>, UnsafePointer<CChar>, UnsafePointer<UInt8>, Int32, Int32) -> Void
 public typealias CB4UPeripheralDidWriteValueForCharacteristicHandler = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>, UnsafePointer<CChar>, UnsafePointer<CChar>, Int32) -> Void
 public typealias CB4UPeripheralDidUpdateNotificationStateForCharacteristicHandler = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>, UnsafePointer<CChar>, UnsafePointer<CChar>, Int32, Int32) -> Void
-public typealias CB4UPeripheralDidUpdateRSSIHandler = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>, Int32) -> Void
 public typealias CB4UPeripheralDidReadRSSIHandler = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>, Int32, Int32) -> Void
 
 @_cdecl("cb4u_central_manager_register_handlers")
@@ -39,7 +38,6 @@ public func cb4u_central_manager_register_handlers(
     _ didUpdateValueForCharacteristicHandler: @escaping CB4UPeripheralDidUpdateValueForCharacteristicHandler,
     _ didWriteValueForCharacteristicHandler: @escaping CB4UPeripheralDidWriteValueForCharacteristicHandler,
     _ didUpdateNotificationStateForCharacteristicHandler: @escaping CB4UPeripheralDidUpdateNotificationStateForCharacteristicHandler,
-    _ didUpdateRSSIHandler: @escaping CB4UPeripheralDidUpdateRSSIHandler,
     _ didReadRSSIHandler: @escaping CB4UPeripheralDidReadRSSIHandler
 ) {
     let instance = Unmanaged<CB4UCentralManager>.fromOpaque(centralPtr).takeUnretainedValue()
@@ -54,7 +52,6 @@ public func cb4u_central_manager_register_handlers(
     instance.didUpdateValueForCharacteristicHandler = didUpdateValueForCharacteristicHandler
     instance.didWriteValueForCharacteristicHandler = didWriteValueForCharacteristicHandler
     instance.didUpdateNotificationStateForCharacteristicHandler = didUpdateNotificationStateForCharacteristicHandler
-    instance.didUpdateRSSIHandler = didUpdateRSSIHandler
     instance.didReadRSSIHandler = didReadRSSIHandler
 }
 

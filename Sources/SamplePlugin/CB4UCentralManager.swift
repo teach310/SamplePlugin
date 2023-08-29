@@ -17,7 +17,6 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
     var didUpdateValueForCharacteristicHandler: CB4UPeripheralDidUpdateValueForCharacteristicHandler?
     var didWriteValueForCharacteristicHandler: CB4UPeripheralDidWriteValueForCharacteristicHandler?
     var didUpdateNotificationStateForCharacteristicHandler: CB4UPeripheralDidUpdateNotificationStateForCharacteristicHandler?
-    var didUpdateRSSIHandler: CB4UPeripheralDidUpdateRSSIHandler?
     var didReadRSSIHandler: CB4UPeripheralDidReadRSSIHandler?
     
     public override init() {
@@ -306,14 +305,6 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
                     didUpdateNotificationStateForCharacteristicHandler?(selfPointer(), peripheralIdCString, serviceIdCString, characteristicIdCString, Int32(notificationState), errorToCode(error))
                 }
             }
-        }
-    }
-
-    public func peripheralDidUpdateRSSI(_ peripheral: CBPeripheral, error: Error?) {
-        let peripheralId = peripheral.identifier.uuidString
-
-        peripheralId.withCString { (peripheralIdCString) in
-            didUpdateRSSIHandler?(selfPointer(), peripheralIdCString, errorToCode(error))
         }
     }
 
