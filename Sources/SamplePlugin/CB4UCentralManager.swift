@@ -17,6 +17,8 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
     var didUpdateValueForCharacteristicHandler: CB4UPeripheralDidUpdateValueForCharacteristicHandler?
     var didWriteValueForCharacteristicHandler: CB4UPeripheralDidWriteValueForCharacteristicHandler?
     var didUpdateNotificationStateForCharacteristicHandler: CB4UPeripheralDidUpdateNotificationStateForCharacteristicHandler?
+    var didUpdateRSSIHandler: CB4UPeripheralDidUpdateRSSIHandler?
+    var didReadRSSIHandler: CB4UPeripheralDidReadRSSIHandler?
     
     public override init() {
         super.init()
@@ -187,6 +189,14 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         return 0
     }
 
+    public func readRSSI(_ peripheralId: String) -> Int32 {
+        guard let peripheral = peripherals[peripheralId] else {
+            return -1
+        }
+        peripheral.readRSSI()
+        return 0
+    }
+
     // MARK: - CBCentralManagerDelegate
     
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
@@ -296,6 +306,22 @@ public class CB4UCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
                     didUpdateNotificationStateForCharacteristicHandler?(selfPointer(), peripheralIdCString, serviceIdCString, characteristicIdCString, Int32(notificationState), errorToCode(error))
                 }
             }
+        }
+    }
+
+    public func peripheralDidUpdateRSSI(_ peripheral: CBPeripheral, error: Error?) {
+        let peripheralId = peripheral.identifier.uuidString
+
+        peripheralId.withCString { (peripheralIdCString) in
+            didUpdateRSSIHandler?(selfPointer(), peripheralIdCString, errorToCode(error))
+        }
+    }
+
+    public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
+        let peripheralId = peripheral.identifier.uuidString
+
+        peripheralId.withCString { (peripheralIdCString) in
+            didReadRSSIHandler?(selfPointer(), peripheralIdCString, Int32(RSSI.intValue), errorToCode(error))
         }
     }
 
