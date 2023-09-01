@@ -34,17 +34,30 @@ public class CB4UCentralManager: NSObject {
         return Unmanaged.passUnretained(self).toOpaque()
     }
     
+    // NOTE: code 0 is unknown error. so if error is nil, return -1.
+    func errorToCode(_ error: Error?) -> Int32 {
+        if error == nil {
+            return -1
+        }
+        
+        if let error = error as? CBError {
+            return Int32(error.errorCode)
+        }
+        
+        return Int32(error!._code)
+    }
+    
     public func retrievePeripherals(withIdentifiers identifiers: [UUID], _ sb: UnsafeMutablePointer<CChar>, _ sbSize: Int) -> Int32 {
         let foundPeripherals = centralManager.retrievePeripherals(withIdentifiers: identifiers)
         let foundPeripheralsCount = foundPeripherals.count
         if foundPeripheralsCount == 0 {
-            return -1
+            return failure
         }
         
         let commaSeparatedPeripheralIds = foundPeripherals.map { $0.identifier.uuidString }.joined(separator: ",")
         let commaSeparatedPeripheralIdsLength = commaSeparatedPeripheralIds.utf8.count
         if commaSeparatedPeripheralIdsLength + 1 > sbSize {
-            return -1
+            return failure
         }
         
         for peripheral in foundPeripherals {
@@ -55,7 +68,7 @@ public class CB4UCentralManager: NSObject {
             strcpy(sb, uuidCString)
         }
         
-        return 0
+        return success
     }
     
     // MARK: - Scanning or Stopping Scans of Peripherals
@@ -81,48 +94,18 @@ public class CB4UCentralManager: NSObject {
     
     public func connect(_ peripheralId: String) -> Int32 {
         guard let peripheral = peripherals[peripheralId] else {
-            return -1
+            return peripheralNotFound
         }
         centralManager.connect(peripheral)
-        return 0
+        return success
     }
     
     public func cancelPeripheralConnection(_ peripheralId: String) -> Int32 {
         guard let peripheral = peripherals[peripheralId] else {
-            return -1
+            return peripheralNotFound
         }
         centralManager.cancelPeripheralConnection(peripheral)
-        return 0
-    }
-    
-    // NOTE: code 0 is unknown error. so if error is nil, return -1.
-    func errorToCode(_ error: Error?) -> Int32 {
-        if error == nil {
-            return -1
-        }
-        
-        if let error = error as? CBError {
-            return Int32(error.errorCode)
-        }
-        
-        return Int32(error!._code)
-    }
-}
-
-extension CB4UCentralManager {
-    // MARK: - Characteristic Proxy
-    
-    public func characteristicProperties(_ peripheralId: String, _ serviceId: String, _ characteristicId: String) -> Int32 {
-        guard let peripheral = peripherals[peripheralId] else {
-            return -1
-        }
-        guard let service = peripheral.services?.first(where: { $0.uuid.uuidString == serviceId }) else {
-            return -1
-        }
-        guard let characteristic = service.characteristics?.first(where: { $0.uuid.uuidString == characteristicId }) else {
-            return -1
-        }
-        return Int32(characteristic.properties.rawValue)
+        return success
     }
 }
 

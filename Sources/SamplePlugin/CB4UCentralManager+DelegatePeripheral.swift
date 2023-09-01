@@ -7,14 +7,14 @@ extension CB4UCentralManager {
         }
         return action(peripheral)
     }
-
+    
     func delegatePeripheral(_ peripheralId: String, _ action: (CBPeripheral) -> Void) -> Int32 {
         return delegatePeripheral(peripheralId) { (peripheral) -> Int32 in
             action(peripheral)
             return success
         }
     }
-
+    
     func delegatePeripheralForCharacteristic(_ peripheralId: String, _ serviceUUID: CBUUID, _ characteristicUUID: CBUUID, _ action: (CBPeripheral, CBCharacteristic) -> Void) -> Int32 {
         guard let peripheral = peripherals[peripheralId] else {
             return peripheralNotFound
