@@ -4,7 +4,7 @@ import CoreBluetooth
 // This is a wrapper class for exposing CBCentralManager to Unity.
 public class CB4UCentralManager: NSObject {
     private var centralManager: CBCentralManager!
-    private var peripherals: Dictionary<String, CBPeripheral> = [:]
+    var peripherals: Dictionary<String, CBPeripheral> = [:]
     
     var didUpdateStateHandler: CB4UCentralManagerDidUpdateStateHandler?
     var didDiscoverPeripheralHandler: CB4UCentralManagerDidDiscoverPeripheralHandler?
@@ -18,6 +18,12 @@ public class CB4UCentralManager: NSObject {
     var didWriteValueForCharacteristicHandler: CB4UPeripheralDidWriteValueForCharacteristicHandler?
     var didUpdateNotificationStateForCharacteristicHandler: CB4UPeripheralDidUpdateNotificationStateForCharacteristicHandler?
     var didReadRSSIHandler: CB4UPeripheralDidReadRSSIHandler?
+    
+    let peripheralNotFound: Int32 = -1
+    let serviceNotFound: Int32 = -1
+    let characteristicNotFound: Int32 = -1
+    let failure: Int32 = -1 // unprocessable error
+    let success: Int32 = 0
     
     public override init() {
         super.init()
@@ -100,104 +106,6 @@ public class CB4UCentralManager: NSObject {
         }
         
         return Int32(error!._code)
-    }
-}
-
-extension CB4UCentralManager {
-    // MARK: - Peripheral Proxy
-    
-    public func peripheralName(_ peripheralId: String, _ sb: UnsafeMutablePointer<CChar>, _ sbSize: Int) -> Int32 {
-        guard let peripheral = peripherals[peripheralId] else {
-            return -1
-        }
-        guard let peripheralName = peripheral.name else {
-            return -1
-        }
-        let peripheralNameLength = peripheralName.utf8.count
-        if peripheralNameLength + 1 > sbSize {
-            return -1
-        }
-        _ = peripheralName.withCString { (nameCString) in
-            strcpy(sb, nameCString)
-        }
-        return 0
-    }
-    
-    public func peripheralState(_ peripheralId: String) -> Int32 {
-        guard let peripheral = peripherals[peripheralId] else {
-            return -1
-        }
-        return Int32(peripheral.state.rawValue)
-    }
-    
-    public func discoverServices(_ peripheralId: String, _ serviceUUIDs: [CBUUID]?) -> Int32 {
-        guard let peripheral = peripherals[peripheralId] else {
-            return -1
-        }
-        peripheral.discoverServices(serviceUUIDs)
-        return 0
-    }
-    
-    public func discoverCharacteristics(_ peripheralId: String, _ serviceUUID: CBUUID, _ characteristicUUIDs: [CBUUID]?) -> Int32 {
-        guard let peripheral = peripherals[peripheralId] else {
-            return -1
-        }
-        guard let service = peripheral.services?.first(where: { $0.uuid == serviceUUID }) else {
-            return -1
-        }
-        peripheral.discoverCharacteristics(characteristicUUIDs, for: service)
-        return 0
-    }
-    
-    public func readValue(_ peripheralId: String, _ serviceUUID: CBUUID, _ characteristicUUID: CBUUID) -> Int32 {
-        guard let peripheral = peripherals[peripheralId] else {
-            return -1
-        }
-        guard let service = peripheral.services?.first(where: { $0.uuid == serviceUUID }) else {
-            return -1
-        }
-        guard let characteristic = service.characteristics?.first(where: { $0.uuid == characteristicUUID }) else {
-            return -1
-        }
-        peripheral.readValue(for: characteristic)
-        return 0
-    }
-    
-    public func writeValue(_ peripheralId: String, _ serviceUUID: CBUUID, _ characteristicUUID: CBUUID, _ data: Data, _ type: CBCharacteristicWriteType) -> Int32 {
-        guard let peripheral = peripherals[peripheralId] else {
-            return -1
-        }
-        guard let service = peripheral.services?.first(where: { $0.uuid == serviceUUID }) else {
-            return -1
-        }
-        guard let characteristic = service.characteristics?.first(where: { $0.uuid == characteristicUUID }) else {
-            return -1
-        }
-        
-        peripheral.writeValue(data, for: characteristic, type: type)
-        return 0
-    }
-    
-    public func setNotifyValue(_ peripheralId: String, _ serviceUUID: CBUUID, _ characteristicUUID: CBUUID, _ enabled: Bool) -> Int32 {
-        guard let peripheral = peripherals[peripheralId] else {
-            return -1
-        }
-        guard let service = peripheral.services?.first(where: { $0.uuid == serviceUUID }) else {
-            return -1
-        }
-        guard let characteristic = service.characteristics?.first(where: { $0.uuid == characteristicUUID }) else {
-            return -1
-        }
-        peripheral.setNotifyValue(enabled, for: characteristic)
-        return 0
-    }
-    
-    public func readRSSI(_ peripheralId: String) -> Int32 {
-        guard let peripheral = peripherals[peripheralId] else {
-            return -1
-        }
-        peripheral.readRSSI()
-        return 0
     }
 }
 
